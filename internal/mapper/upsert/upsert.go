@@ -17,7 +17,7 @@ func Do(ctx context.Context, session neo4j.SessionWithContext, host *entity.Host
 		if err != nil {
 			return nil, err
 		}
-		_, err = tx.Run(context.Background(), q, params)
+		_, err = tx.Run(ctx, q, params)
 		return nil, err
 
 	})

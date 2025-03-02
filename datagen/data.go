@@ -92,7 +92,12 @@ func genHost(student string) (host *entity.Host) {
 	if rand.IntN(2) == 1 {
 		host = hosts[0]
 	} else {
-		host = hosts[2]
+		switch student {
+		case david:
+			host = hosts[1]
+		case miriam:
+			host = hosts[2]
+		}
 	}
 	host.User = users[student]
 	return host

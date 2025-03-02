@@ -18,8 +18,14 @@ func main() {
 	session := driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
 
+	// This poc generate IDs in ascending way from 1, there is no use to rerun the command on existing data. So lets wipe it before start.
+	err := mapper.Trunk(ctx, session)
+	if err != nil {
+		log.Fatal("Failed to trunk data:", err)
+	}
+
 	// This mimic how message will be handled after pulled from the topic
-	for i := 10; i > 0; i-- {
+	for i := 15; i > 0; i-- {
 		host := datagen.Generate(i)
 		err := mapper.Upsert(ctx, session, host)
 		if err != nil {
