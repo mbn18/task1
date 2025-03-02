@@ -18,13 +18,14 @@ const (
 
 		MERGE (u)-[r1:LOGGED_ON]->(h)
 `
-	processQuery = `
+	processNodeQuery = `
 		MERGE (%s:Process {id: $%s.id})
 		ON CREATE SET %s
 		ON MATCH SET %s
-
-		MERGE (u)-[r%s:INITIATED {created_at: $createdAt}]->(%s)
-		MERGE (%s)-[r2%s:RUN_ON {created_at: $createdAt}]->(h)
+`
+	processEdgeQuery = `
+		MERGE (u)-[r%s:INITIATED {created_at: $processes.created_at}]->(%s)
+		MERGE (%s)-[r2%s:RUN_ON {created_at: $processes.created_at}]->(h)
 `
 )
 
@@ -33,13 +34,13 @@ func queryBuilder(params map[string]any) (string, error) {
 
 	u, ok := params[mapKeyUser].(map[string]any)
 	if !ok {
-		return "", errors.New("user is not a map[string]map[string]any")
+		return "", errors.New("user is not a map[string]any")
 	}
 	varsUser := keysToVarList("user", "u", GetKeys(u))
 
 	h, ok := params[mapKeyHost].(map[string]any)
 	if !ok {
-		return "", errors.New("host is not a map[string]map[string]any")
+		return "", errors.New("host is not a map[string]any")
 	}
 
 	varsHost := keysToVarList("host", "h", GetKeys(h))
@@ -49,17 +50,19 @@ func queryBuilder(params map[string]any) (string, error) {
 
 	p, ok := params[mapKeyProcesses].(map[string]any)
 	if !ok {
-		return "", errors.New("processes is not a map[string]map[string]any")
+		return "", errors.New("processes is not a map[string]any")
 	}
 
 	for i, pMap := range p {
 		list, ok := pMap.(map[string]any)
 		if !ok {
-			return "", errors.New("processes is not a map[string]map[string]any")
+			continue
 		}
 		ref := fmt.Sprintf("%s.%s", mapKeyProcesses, i)
 		vars := keysToVarList(ref, i, GetKeys(list))
-		partial := fmt.Sprintf(processQuery, i, ref, vars, vars, i, i, i, i)
+		partial := fmt.Sprintf(processNodeQuery, i, ref, vars, vars)
+		b.WriteString(partial)
+		partial = fmt.Sprintf(processEdgeQuery, i, i, i, i)
 		b.WriteString(partial)
 	}
 	return b.String(), nil
