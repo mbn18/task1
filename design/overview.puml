@@ -1,0 +1,32 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor Cli
+boundary API
+queue Topic
+collections microservice AS ms
+database Neo4J
+
+== Ingest ==
+Cli -> API: GRPC
+API -> Topic: Protobuf
+API -> Cli: response
+ms -> Topic: pull message
+ms -> ms: Parse
+alt input valid
+    ms -> Neo4J: store
+else input invalid
+    ms -> Topic: deadletter
+end
+== Query Opt 1 ==
+Cli -> API: GRPC/Rest
+API -> Neo4J
+API -> Cli: response
+== Query Opt 2 ==
+Cli -> Neo4J: Cypher
+Neo4J -> Cli: response
+== Query Opt 3 ==
+Cli -> API: Cypher
+API -> Neo4J: reverse proxy
+API -> Cli: response
+@enduml

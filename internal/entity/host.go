@@ -17,6 +17,8 @@ type Host struct {
 	Processes ProcessList
 }
 
+// This method is used by the mapper, Should it be a fuction in the mapper or stay here as method?
+// If we extend the system, then the ToMap() will serve diffrent cli and by that might violate the single responsebility principle.
 func (h Host) ToMap() map[string]any {
 	data := map[string]any{
 		"id": h.ID,

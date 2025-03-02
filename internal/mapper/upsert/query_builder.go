@@ -29,6 +29,7 @@ const (
 `
 )
 
+// Might be a good refactor to use template.Template. Both for performance, maintainability, and readability
 func queryBuilder(params map[string]any) (string, error) {
 	b := strings.Builder{}
 

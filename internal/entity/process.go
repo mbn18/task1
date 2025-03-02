@@ -23,6 +23,8 @@ type Process struct {
 	Args    string
 }
 
+// This method is used by the mapper, Should it be a fuction in the mapper or stay here as method?
+// If we extend the system, then the ToMap() will serve diffrent cli and by that might violate the single responsebility principle.
 func (p Process) ToMap() map[string]any {
 	return map[string]any{
 		"id":       p.Id.String(),
